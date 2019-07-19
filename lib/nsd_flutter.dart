@@ -3,8 +3,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 
 class NsdFlutter {
-  static const MethodChannel _channel =
-      const MethodChannel('nsd_flutter');
+  static const MethodChannel _channel = const MethodChannel('nsd_flutter');
 
   static Future<String> get platformVersion async {
     final String version = await _channel.invokeMethod('getPlatformVersion');

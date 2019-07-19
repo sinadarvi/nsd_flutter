@@ -1,4 +1,4 @@
-package io.github.sinadarvi.nsd
+package io.github.sinadarvi.nsd_flutter.nsd
 
 import android.net.nsd.NsdServiceInfo
 
