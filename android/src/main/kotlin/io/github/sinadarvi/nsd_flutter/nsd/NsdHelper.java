@@ -287,6 +287,11 @@ public class NsdHelper implements DiscoveryTimer.OnTimeoutListener {
             mNsdListener.onNsdRegistered(mRegisteredService);
     }
 
+    void onUnregistered(){
+        if (mNsdListener != null)
+            mNsdListener.onNsdUnregisterd();
+    }
+
     void onNsdServiceFound(NsdServiceInfo foundService) {
         mDiscoveryTimer.reset();
         if (mNsdListener != null)

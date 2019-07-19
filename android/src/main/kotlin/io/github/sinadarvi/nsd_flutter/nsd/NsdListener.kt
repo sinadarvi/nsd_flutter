@@ -42,4 +42,7 @@ interface NsdListener {
      * @param errorSource  Class/listener which caused the error.
      */
     fun onNsdError(errorMessage: String, errorCode: Int, errorSource: String)
+
+
+    fun onNsdUnregisterd()
 }

@@ -11,13 +11,17 @@ import io.github.sinadarvi.nsd_flutter.nsd.NsdService
 import io.github.sinadarvi.nsd_flutter.nsd.NsdType
 
 
-class NsdFlutterPlugin(var registrar: Registrar) : MethodCallHandler , NsdListener{
+class NsdFlutterPlugin(private var registrar: Registrar) : MethodCallHandler , NsdListener{
 
   private lateinit var nsdHelper: NsdHelper
   private var isRegistered = false
 
   override fun onNsdRegistered(registeredService: NsdService) {
     isRegistered = true
+  }
+
+  override fun onNsdUnregisterd() {
+    isRegistered = false
   }
 
   override fun onNsdDiscoveryFinished() {
@@ -33,7 +37,7 @@ class NsdFlutterPlugin(var registrar: Registrar) : MethodCallHandler , NsdListen
   }
 
   override fun onNsdServiceLost(lostService: NsdService) {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    isRegistered = false
   }
 
   override fun onNsdError(errorMessage: String, errorCode: Int, errorSource: String) {
@@ -75,13 +79,13 @@ class NsdFlutterPlugin(var registrar: Registrar) : MethodCallHandler , NsdListen
       result.success(reg.toString())
     }else if (call.method == "initializeNsdHelper"){
       initializeNsdHelper()
-      result.success("NSD helper initialized")
+      result.success("true")
     }else if (call.method == "registerIt"){
       registerIt()
-      result.success("registerIt Done")
+      result.success("true")
     }else if (call.method == "unregisterIt"){
       unregisterIt()
-      result.success("unregisterIt Done")
+      result.success("true")
     } else {
       result.notImplemented()
     }

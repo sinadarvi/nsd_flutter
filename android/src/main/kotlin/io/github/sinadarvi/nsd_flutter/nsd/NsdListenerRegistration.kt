@@ -22,5 +22,6 @@ class NsdListenerRegistration(private val mNsdHelper: NsdHelper) : NsdManager.Re
 
     override fun onServiceUnregistered(serviceInfo: NsdServiceInfo) {
         mNsdHelper.logMsg("Unregistered -> ${serviceInfo.serviceName}")
+        mNsdHelper.onUnregistered()
     }
 }
