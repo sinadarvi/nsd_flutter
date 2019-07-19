@@ -13,6 +13,10 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
+  String _isItRegistered = 'Unknown';
+  String _initializeNsdHelper = 'Unknown';
+  String _registerIt = 'Unknown';
+  String _unregisterIt = 'Unknown';
 
   @override
   void initState() {
@@ -47,8 +51,94 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+        body: Column(
+          children: <Widget>[
+            Text('Running on: $_platformVersion\n'),
+            Row(
+              children: <Widget>[
+                Text(_isItRegistered),
+                RaisedButton(
+                  child: Text("isItRegistered"),
+                  onPressed: () async {
+                    String result = await NsdFlutter.isItRegistered;
+                    try {
+                      setState(() {
+                        _isItRegistered = result;
+                      });
+                    } on PlatformException {
+                      result = 'Failed to get isItRegistered.';
+                      setState(() {
+                        _isItRegistered = result;
+                      });
+                    }
+                  },
+                )
+              ],
+            ),
+            Row(
+              children: <Widget>[
+                Text(_initializeNsdHelper),
+                RaisedButton(
+                  child: Text("initializeNsdHelper"),
+                  onPressed: () async {
+                    String result = await NsdFlutter.initializeNsdHelper;
+                    try {
+                      setState(() {
+                        _initializeNsdHelper = result;
+                      });
+                    } on PlatformException {
+                      result = 'Failed to get initializeNsdHelper.';
+                      setState(() {
+                        _initializeNsdHelper = result;
+                      });
+                    }
+                  },
+                )
+              ],
+            ),
+            Row(
+              children: <Widget>[
+                Text(_registerIt),
+                RaisedButton(
+                  child: Text("registerIt"),
+                  onPressed: () async {
+                    String result = await NsdFlutter.registerIt;
+                    try {
+                      setState(() {
+                        _registerIt = result;
+                      });
+                    } on PlatformException {
+                      result = 'Failed to get registerIt.';
+                      setState(() {
+                        _registerIt = result;
+                      });
+                    }
+                  },
+                )
+              ],
+            ),
+            Row(
+              children: <Widget>[
+                Text(_unregisterIt),
+                RaisedButton(
+                  child: Text("unregisterIt"),
+                  onPressed: () async {
+                    String result = await NsdFlutter.unregisterIt;
+                    try {
+                      setState(() {
+                        _unregisterIt = result;
+                      });
+                    } on PlatformException {
+                      result = 'Failed to get unregisterIt.';
+                      setState(() {
+                        _unregisterIt = result;
+                      });
+                    }
+                  },
+                )
+              ],
+            )
+          ],
         ),
       ),
     );
