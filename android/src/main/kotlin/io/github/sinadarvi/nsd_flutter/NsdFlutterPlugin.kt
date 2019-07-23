@@ -1,5 +1,6 @@
 package io.github.sinadarvi.nsd_flutter
 
+import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
@@ -11,17 +12,35 @@ import io.github.sinadarvi.nsd_flutter.nsd.NsdService
 import io.github.sinadarvi.nsd_flutter.nsd.NsdType
 
 
-class NsdFlutterPlugin(private var registrar: Registrar) : MethodCallHandler , NsdListener{
+class NsdFlutterPlugin(private var registrar: Registrar) : MethodCallHandler , NsdListener, EventChannel.StreamHandler{
+
 
   private lateinit var nsdHelper: NsdHelper
-  private var isRegistered = false
+//  private var registered = false
+  private var eventSink: EventChannel.EventSink? = null
+
+  companion object {
+    @JvmStatic
+    fun registerWith(registrar: Registrar) {
+      val plugin = NsdFlutterPlugin(registrar)
+      val channel = MethodChannel(registrar.messenger(), "nsdMethodChannel")
+      channel.setMethodCallHandler(plugin)
+
+      val registeredEventChannel = EventChannel(registrar.messenger() , "registeredEventChannel")
+      registeredEventChannel.setStreamHandler(plugin)
+    }
+  }
 
   override fun onNsdRegistered(registeredService: NsdService) {
-    isRegistered = true
+    registrar.activity().runOnUiThread {
+      eventSink?.success(true)
+    }
   }
 
   override fun onNsdUnregisterd() {
-    isRegistered = false
+    registrar.activity().runOnUiThread {
+      eventSink?.success(false)
+    }
   }
 
   override fun onNsdDiscoveryFinished() {
@@ -37,16 +56,16 @@ class NsdFlutterPlugin(private var registrar: Registrar) : MethodCallHandler , N
   }
 
   override fun onNsdServiceLost(lostService: NsdService) {
-    isRegistered = false
+
   }
 
   override fun onNsdError(errorMessage: String, errorCode: Int, errorSource: String) {
     TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
   }
 
-  fun isItRegistered(): Boolean {
-    return isRegistered
-  }
+//  fun isRegistered(): Boolean {
+//    return registered
+//  }
 
   fun initializeNsdHelper() {
     nsdHelper = NsdHelper(registrar.context(), this)
@@ -63,21 +82,21 @@ class NsdFlutterPlugin(private var registrar: Registrar) : MethodCallHandler , N
     nsdHelper.unregisterService()
   }
 
-  companion object {
-    @JvmStatic
-    fun registerWith(registrar: Registrar) {
-      val channel = MethodChannel(registrar.messenger(), "nsd_flutter")
-      channel.setMethodCallHandler(NsdFlutterPlugin(registrar))
-    }
+  override fun onListen(args: Any?, eventSink: EventChannel.EventSink?) {
+    this.eventSink = eventSink
+  }
+
+  override fun onCancel(args: Any?) {
+    this.eventSink = null
   }
 
   override fun onMethodCall(call: MethodCall, result: Result) {
     if (call.method == "getPlatformVersion") {
       result.success("Android ${android.os.Build.VERSION.RELEASE}")
-    }else if(call.method == "isItRegistered") {
-      val reg = isItRegistered()
+    }/*else if(call.method == "isRegistered") {
+      val reg = isRegistered()
       result.success(reg.toString())
-    }else if (call.method == "initializeNsdHelper"){
+    }*/else if (call.method == "initializeNsdHelper"){
       initializeNsdHelper()
       result.success("true")
     }else if (call.method == "registerIt"){

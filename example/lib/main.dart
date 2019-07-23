@@ -91,24 +91,18 @@ class _MyAppState extends State<MyApp> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                Text(_isItRegistered),
-                RaisedButton(
-                  child: Text("Check if registered or not"),
-                  onPressed: () async {
-                    String result = await NsdFlutter.isItRegistered;
-                    setState(() {
-                      if (result == 'true') {
-                        _isItRegistered = 'Registered';
-                        _registerIt = 'Registered';
-                        _unregisterIt = 'Registered';
-                      } else {
-                        _isItRegistered = 'Not Registered';
-                        _registerIt = 'Not Registered';
-                        _unregisterIt = 'Not Registered';
-                      }
-                    });
+                StreamBuilder(
+                  stream: NsdFlutter.registeredStream,
+                  builder:
+                      (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                    if (snapshot.hasData) {
+                      String value =
+                          snapshot.data == true ? 'registered' : 'unregister';
+                      return Text("$value");
+                    }
+                    return Text("noData");
                   },
-                )
+                ),
               ],
             ),
             Row(
