@@ -51,75 +51,53 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text('Running on: $_platformVersion\n'),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Text(_initializeNsdHelper),
-                RaisedButton(
-                  child: Text("Initialize NSD helper"),
-                  onPressed: () async {
-                    String result = await NsdFlutter.initializeNsdHelper;
-                    setState(() {
-                      _initializeNsdHelper = result == 'true'
-                          ? 'NSD Helper Initilized'
-                          : 'NSD Helper Not Initialized';
-                    });
-                  },
-                )
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Text(_registerIt),
-                RaisedButton(
-                  child: Text("Register"),
-                  onPressed: () async {
-                    String result = await NsdFlutter.registerIt;
-                    setState(() {
-                      _registerIt =
-                          result == 'true' ? 'Registering...' : 'Normal';
-                    });
-                  },
-                )
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                StreamBuilder(
-                  stream: NsdFlutter.registeredStream,
-                  builder:
-                      (BuildContext context, AsyncSnapshot<bool> snapshot) {
-                    if (snapshot.hasData) {
-                      String value =
-                          snapshot.data == true ? 'registered' : 'unregister';
-                      return Text("$value");
-                    }
-                    return Text("noData");
-                  },
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Text(_unregisterIt),
-                RaisedButton(
-                  child: Text("Unregister"),
-                  onPressed: () async {
-                    String result = await NsdFlutter.unregisterIt;
-                    _unregisterIt =
-                        result == 'true' ? 'UnRegistering' : 'Normal';
-                  },
-                )
-              ],
-            )
-          ],
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text('Running on: $_platformVersion\n'),
+              Text(_initializeNsdHelper),
+              StreamBuilder(
+                stream: NsdFlutter.registeredStream,
+                builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                  if (snapshot.hasData) {
+                    String value =
+                        snapshot.data == true ? 'Registered' : 'Unregister';
+                    return Text("$value");
+                  }
+                  return Text("Registering Status");
+                },
+              ),
+              RaisedButton(
+                child: Text("Initialize NSD helper"),
+                onPressed: () async {
+                  String result = await NsdFlutter.initializeNsdHelper;
+                  setState(() {
+                    _initializeNsdHelper = result == 'true'
+                        ? 'NSD Helper Initilized'
+                        : 'NSD Helper Not Initialized';
+                  });
+                },
+              ),
+              RaisedButton(
+                child: Text("Register"),
+                onPressed: () async {
+                  String result = await NsdFlutter.registerIt;
+                  setState(() {
+                    _registerIt =
+                        result == 'true' ? 'Registering...' : 'Normal';
+                  });
+                },
+              ),
+              RaisedButton(
+                child: Text("Unregister"),
+                onPressed: () async {
+                  String result = await NsdFlutter.unregisterIt;
+                  _unregisterIt = result == 'true' ? 'UnRegistering' : 'Normal';
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
