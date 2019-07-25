@@ -14,7 +14,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
-  String _initializeNsdHelper = 'NSD Helper Not Initialized';
+  NsdFlutter nsdFlutter;
 
   @override
   void initState() {
@@ -54,7 +54,8 @@ class _MyAppState extends State<MyApp> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text('Running on: $_platformVersion\n'),
-              Text(_initializeNsdHelper),
+              // Text(_initializeNsdHelper),
+
               StreamBuilder(
                 stream: NsdFlutter.registeredStream,
                 builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
@@ -69,24 +70,23 @@ class _MyAppState extends State<MyApp> {
               RaisedButton(
                 child: Text("Initialize NSD helper"),
                 onPressed: () async {
-                  String result = await NsdFlutter.initializeNsdHelper;
-                  setState(() {
-                    _initializeNsdHelper = result == 'true'
-                        ? 'NSD Helper Initilized'
-                        : 'NSD Helper Not Initialized';
-                  });
+                  this.nsdFlutter = NsdFlutter(
+                    isLogEnabled: true,
+                    isAutoResolveEnabled: true,
+                    discoveryTimeout: 30,
+                  );
                 },
               ),
               RaisedButton(
                 child: Text("Register"),
                 onPressed: () async {
-                  await NsdFlutter.register("MyApp", NsdType.HTTP);
+                  await nsdFlutter.register("MyApp", NsdType.HTTP);
                 },
               ),
               RaisedButton(
                 child: Text("Unregister"),
                 onPressed: () async {
-                  await NsdFlutter.unregister;
+                  await nsdFlutter.unregister;
                 },
               ),
             ],

@@ -64,15 +64,13 @@ class NsdFlutterPlugin(private var registrar: Registrar) : MethodCallHandler, Ns
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-//  fun isRegistered(): Boolean {
-//    return registered
-//  }
-
-    fun initializeNsdHelper() {
+    private fun initializeNsdHelper(isLogEnabled: Boolean,isAutoResolveEnabled: Boolean,discoveryTimeout: Int) {
+        //TODO modifying this is next step
         nsdHelper = NsdHelper(registrar.context(), this)
-        nsdHelper.isLogEnabled = true
-        nsdHelper.isAutoResolveEnabled = true
-        nsdHelper.setDiscoveryTimeout(30)
+        nsdHelper.isLogEnabled = isLogEnabled
+        nsdHelper.isAutoResolveEnabled = isAutoResolveEnabled
+        nsdHelper.setDiscoveryTimeout(discoveryTimeout)
+        Log.e("NsdFlutter", "isLogEnabled: $isLogEnabled isAutoResolveEnabled: $isAutoResolveEnabled discoveryTimeout: $discoveryTimeout")
     }
 
     private fun register(desiredServiceName: String, nsdType : String) {
@@ -80,8 +78,6 @@ class NsdFlutterPlugin(private var registrar: Registrar) : MethodCallHandler, Ns
             throw Exception("nsdType is not one of NSD Types, nsdType : $nsdType")
         nsdHelper.registerService(desiredServiceName, nsdType)
         Log.e("NsdFlutter", "desiredServiceName: $desiredServiceName nsdType: $nsdType")
-
-//        NsdType.HTTP
     }
 
     private fun unregister() {
@@ -102,8 +98,23 @@ class NsdFlutterPlugin(private var registrar: Registrar) : MethodCallHandler, Ns
                 result.success("Android ${android.os.Build.VERSION.RELEASE}")
             }
             "initializeNsdHelper" -> {
-                initializeNsdHelper()
-                result.success("true")
+                val isLogEnabled = call.argument<Boolean>("isLogEnabled")
+                val isAutoResolveEnabled = call.argument<Boolean>("isAutoResolveEnabled")
+                val discoveryTimeout = call.argument<Int>("discoveryTimeout")
+                try {
+                    when {
+                        isLogEnabled == null -> throw Exception("isLogEnabled is null")
+                        isAutoResolveEnabled == null -> throw Exception("isAutoResolveEnabled is null")
+                        discoveryTimeout == null -> throw Exception("isAutoResolveEnabled is null")
+                        else -> {
+                            initializeNsdHelper(isLogEnabled, isAutoResolveEnabled, discoveryTimeout)
+                            result.success(null)
+                        }
+                    }
+
+                }catch (e: Exception){
+                    result.error("InitializeError", e.message, null)
+                }
             }
             "register" -> {
                 val desiredServiceName = call.argument<String>("desiredServiceName")
@@ -123,7 +134,7 @@ class NsdFlutterPlugin(private var registrar: Registrar) : MethodCallHandler, Ns
             }
             "unregister" -> {
                 unregister()
-                result.success("true")
+                result.success(null)
             }
             else -> result.notImplemented()
         }

@@ -1,9 +1,20 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:nsd_flutter/nsd_type.dart';
 
 class NsdFlutter {
+  final bool isLogEnabled;
+  final bool isAutoResolveEnabled;
+  final int discoveryTimeout;
+
+  NsdFlutter(
+      {this.isLogEnabled = false,
+      this.isAutoResolveEnabled = true,
+      this.discoveryTimeout = 15})
+      : assert(isLogEnabled != null) {
+    initializeNsdHelper(isLogEnabled, isAutoResolveEnabled, discoveryTimeout);
+  }
+
   static const MethodChannel _channel = const MethodChannel('nsdMethodChannel');
 
   static const EventChannel _registeredEventChannel =
@@ -25,13 +36,20 @@ class NsdFlutter {
     return version;
   }
 
-  static Future<String> get initializeNsdHelper async {
-    final String nsd = await _channel.invokeMethod('initializeNsdHelper');
-    return nsd;
+  Future<void> initializeNsdHelper(bool isLogEnabled, bool isAutoResolveEnabled,
+      int discoveryTimeout) async {
+    try {
+      return _channel.invokeMethod('initializeNsdHelper', <String, dynamic>{
+        'isLogEnabled': isLogEnabled,
+        'isAutoResolveEnabled': isAutoResolveEnabled,
+        'discoveryTimeout': discoveryTimeout,
+      });
+    } on PlatformException catch (e) {
+      throw 'Unable to register: ${e.message}';
+    }
   }
 
-  static Future<void> register(
-      String desiredServiceName, String nsdType) async {
+  Future<void> register(String desiredServiceName, String nsdType) async {
     try {
       return _channel.invokeMethod('register', <String, dynamic>{
         'desiredServiceName': desiredServiceName,
@@ -42,8 +60,7 @@ class NsdFlutter {
     }
   }
 
-  static Future<String> get unregister async {
-    final String reg = await _channel.invokeMethod('unregister');
-    return reg;
+  Future<bool> get unregister async {
+    return await _channel.invokeMethod('unregister');
   }
 }
