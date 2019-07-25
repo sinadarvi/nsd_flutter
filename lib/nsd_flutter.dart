@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
+import 'package:nsd_flutter/nsd_type.dart';
 
 class NsdFlutter {
   static const MethodChannel _channel = const MethodChannel('nsdMethodChannel');
@@ -24,23 +25,25 @@ class NsdFlutter {
     return version;
   }
 
-  // static Future<String> get isItRegistered async {
-  //   final String reg = await _channel.invokeMethod('isRegistered');
-  //   return reg;
-  // }
-
   static Future<String> get initializeNsdHelper async {
     final String nsd = await _channel.invokeMethod('initializeNsdHelper');
     return nsd;
   }
 
-  static Future<String> get registerIt async {
-    final String reg = await _channel.invokeMethod('registerIt');
-    return reg;
+  static Future<void> register(
+      String desiredServiceName, String nsdType) async {
+    try {
+      return _channel.invokeMethod('register', <String, dynamic>{
+        'desiredServiceName': desiredServiceName,
+        'type': nsdType
+      });
+    } on PlatformException catch (e) {
+      throw 'Unable to register: ${e.message}';
+    }
   }
 
-  static Future<String> get unregisterIt async {
-    final String reg = await _channel.invokeMethod('unregisterIt');
+  static Future<String> get unregister async {
+    final String reg = await _channel.invokeMethod('unregister');
     return reg;
   }
 }
