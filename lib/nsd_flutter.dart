@@ -39,7 +39,7 @@ class NsdFlutter {
   Future<void> initializeNsdHelper(bool isLogEnabled, bool isAutoResolveEnabled,
       int discoveryTimeout) async {
     try {
-      return _channel.invokeMethod('initializeNsdHelper', <String, dynamic>{
+      _channel.invokeMethod('initializeNsdHelper', <String, dynamic>{
         'isLogEnabled': isLogEnabled,
         'isAutoResolveEnabled': isAutoResolveEnabled,
         'discoveryTimeout': discoveryTimeout,
@@ -51,7 +51,7 @@ class NsdFlutter {
 
   Future<void> register(String desiredServiceName, String nsdType) async {
     try {
-      return _channel.invokeMethod('register', <String, dynamic>{
+      _channel.invokeMethod('register', <String, dynamic>{
         'desiredServiceName': desiredServiceName,
         'type': nsdType
       });
@@ -62,5 +62,19 @@ class NsdFlutter {
 
   Future<bool> get unregister async {
     return await _channel.invokeMethod('unregister');
+  }
+
+  static Future<void> startDiscovery(String nsdType) async {
+    try {
+      _channel.invokeMethod('startDiscovery', <String, String>{
+        'nsdType': nsdType,
+      });
+    } on PlatformException catch (e) {
+      throw 'Unable to startDiscovery: ${e.message}';
+    }
+  }
+
+  static Future<void> stopDiscovery() async {
+    await _channel.invokeMethod('stopDiscovery');
   }
 }

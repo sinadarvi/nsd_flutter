@@ -89,6 +89,18 @@ class _MyAppState extends State<MyApp> {
                   await nsdFlutter.unregister;
                 },
               ),
+              RaisedButton(
+                child: Text("startDiscovery"),
+                onPressed: () async {
+                  await NsdFlutter.startDiscovery;
+                },
+              ),
+              RaisedButton(
+                child: Text("stopDiscovery"),
+                onPressed: () async {
+                  await NsdFlutter.stopDiscovery;
+                },
+              ),
             ],
           ),
         ),

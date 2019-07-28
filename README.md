@@ -6,7 +6,7 @@ for more information please visit : [wiki](https://en.wikipedia.org/wiki/NSD) an
 
 
 # Todo
- - [x] Initialize NSD Service and Just checking Registering
+ - [x] Initialize NSD Service and Just Checking Registering
  - [x] Complete Registering for Android
  - [ ] Complete Discovering for Android
  - [ ] Complete Android Example
