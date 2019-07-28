@@ -11,6 +11,7 @@ import io.github.sinadarvi.nsd_flutter.nsd.NsdHelper
 import io.github.sinadarvi.nsd_flutter.nsd.NsdListener
 import io.github.sinadarvi.nsd_flutter.nsd.NsdService
 import io.github.sinadarvi.nsd_flutter.nsd.NsdType
+import android.R.attr.host
 
 
 class NsdFlutterPlugin(private var registrar: Registrar) : MethodCallHandler, NsdListener, EventChannel.StreamHandler {
@@ -45,26 +46,26 @@ class NsdFlutterPlugin(private var registrar: Registrar) : MethodCallHandler, Ns
     }
 
     override fun onNsdDiscoveryFinished() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        Log.e("NsdFlutter", "onNsdDiscoveryFinished")
     }
 
     override fun onNsdServiceFound(foundService: NsdService) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        Log.e("NsdFlutter", "onNsdServiceFound, hostIp: '${foundService.hostIp}', host: '${foundService.host}', hostName: '${foundService.hostName}'")
     }
 
     override fun onNsdServiceResolved(resolvedService: NsdService) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        Log.e("NsdFlutter", "onNsdServiceResolved, hostIp: '${resolvedService.hostIp}', host: '${resolvedService.host}', hostName: '${resolvedService.hostName}'")
     }
 
     override fun onNsdServiceLost(lostService: NsdService) {
-
+        Log.e("NsdFlutter", "onNsdServiceLost")
     }
 
     override fun onNsdError(errorMessage: String, errorCode: Int, errorSource: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        Log.e("NsdFlutter", "onNsdError, errorMessage: '$errorMessage', errorCode: $errorCode, errorSource: $errorSource")
     }
 
-    private fun initializeNsdHelper(isLogEnabled: Boolean,isAutoResolveEnabled: Boolean,discoveryTimeout: Int) {
+    private fun initializeNsdHelper(isLogEnabled: Boolean, isAutoResolveEnabled: Boolean, discoveryTimeout: Int) {
         //TODO modifying this is next step
         nsdHelper = NsdHelper(registrar.context(), this)
         nsdHelper.isLogEnabled = isLogEnabled
@@ -73,7 +74,7 @@ class NsdFlutterPlugin(private var registrar: Registrar) : MethodCallHandler, Ns
         Log.e("NsdFlutter", "isLogEnabled: $isLogEnabled isAutoResolveEnabled: $isAutoResolveEnabled discoveryTimeout: $discoveryTimeout")
     }
 
-    private fun register(desiredServiceName: String, nsdType : String) {
+    private fun register(desiredServiceName: String, nsdType: String) {
         if (nsdType != NsdType.HTTP && nsdType != NsdType.PRINTER)
             throw Exception("nsdType is not one of NSD Types, nsdType : $nsdType")
         nsdHelper.registerService(desiredServiceName, nsdType)
@@ -112,7 +113,7 @@ class NsdFlutterPlugin(private var registrar: Registrar) : MethodCallHandler, Ns
                         }
                     }
 
-                }catch (e: Exception){
+                } catch (e: Exception) {
                     result.error("InitializeError", e.message, null)
                 }
             }
@@ -123,7 +124,7 @@ class NsdFlutterPlugin(private var registrar: Registrar) : MethodCallHandler, Ns
                     if (desiredServiceName == null) {
                         //TODO : Create suitable exception for this situation.
                         throw Exception("Register Desired Service Name is null")
-                    } else if (type == null){
+                    } else if (type == null) {
                         throw Exception("Register Type is null")
                     }
                     register(desiredServiceName, type)
@@ -134,6 +135,25 @@ class NsdFlutterPlugin(private var registrar: Registrar) : MethodCallHandler, Ns
             }
             "unregister" -> {
                 unregister()
+                result.success(null)
+            }
+            "startDiscovery" -> {
+                val nsdType = call.argument<String>("nsdType")
+                try {
+                    if (nsdType == null) {
+                        throw Exception("nsdType is null")
+                    } else if (nsdType != NsdType.HTTP && nsdType != NsdType.PRINTER)
+                        throw Exception("nsdType is not one of NSD Types, nsdType : $nsdType")
+                    nsdHelper.startDiscovery(nsdType)
+                    result.success(null)
+                } catch (e: Exception) {
+                    result.error("startDiscoveryError", e.message, e)
+                }
+                nsdHelper.startDiscovery(NsdType.HTTP)
+                result.success(null)
+            }
+            "stopDiscovery" -> {
+                nsdHelper.stopDiscovery()
                 result.success(null)
             }
             else -> result.notImplemented()
