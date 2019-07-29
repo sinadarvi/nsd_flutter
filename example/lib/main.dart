@@ -91,14 +91,14 @@ class _MyAppState extends State<MyApp> {
               ),
               RaisedButton(
                 child: Text("startDiscovery"),
-                onPressed: () async {
-                  await NsdFlutter.startDiscovery;
+                onPressed: () {
+                  NsdFlutter.startDiscovery;
                 },
               ),
               RaisedButton(
                 child: Text("stopDiscovery"),
-                onPressed: () async {
-                  await NsdFlutter.stopDiscovery;
+                onPressed: () {
+                  NsdFlutter.stopDiscovery;
                 },
               ),
             ],
